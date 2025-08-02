@@ -31,7 +31,12 @@ const documentTypes = [
   { type: "application-form" as DocumentType, label: "Application Form", required: false },
 ];
 
-export const DocumentUpload = () => {
+interface DocumentUploadProps {
+  onComplete: (documents: File[]) => void;
+  onBack: () => void;
+}
+
+export const DocumentUpload = ({ onComplete, onBack }: DocumentUploadProps) => {
   const [documents, setDocuments] = useState<UploadedDocument[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -129,11 +134,16 @@ export const DocumentUpload = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-foreground mb-4">Upload Your Documents</h2>
-        <p className="text-muted-foreground">
-          Upload the required documents to check your eligibility for healthcare benefits.
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold text-foreground mb-4">Upload Your Documents</h2>
+          <p className="text-muted-foreground">
+            Upload the required documents to check your eligibility for healthcare benefits.
+          </p>
+        </div>
+        <Button variant="outline" onClick={onBack}>
+          Back to Screening
+        </Button>
       </div>
 
       {/* Upload Area */}
@@ -285,7 +295,11 @@ export const DocumentUpload = () => {
             <p className="text-success-foreground/80 mb-4">
               All required documents have been uploaded and processed.
             </p>
-            <Button variant="success" size="lg">
+            <Button 
+              variant="success" 
+              size="lg"
+              onClick={() => onComplete(documents.map(() => new File([], 'mock')))}
+            >
               Check My Eligibility
             </Button>
           </div>

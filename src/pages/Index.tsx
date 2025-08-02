@@ -1,33 +1,84 @@
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
+import { QuickScreener } from "@/components/QuickScreener";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { EligibilityStatus } from "@/components/EligibilityStatus";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState, useEffect } from "react";
+import { useUserFlow } from "@/hooks/useUserFlow";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-type AppState = "landing" | "upload" | "results";
-
 const Index = () => {
-  const [currentState, setCurrentState] = useState<AppState>("landing");
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { 
+    currentStep, 
+    flowData, 
+    nextStep, 
+    goToStep, 
+    updateScreenerData, 
+    updateUploadedDocuments,
+    updateEligibilityResults 
+  } = useUserFlow();
 
   // Redirect non-authenticated users to auth page when they try to access protected features
   useEffect(() => {
-    if (!loading && !user && (currentState === "upload" || currentState === "results")) {
+    if (!loading && !user && (currentStep !== "landing")) {
       navigate('/auth');
     }
-  }, [user, loading, currentState, navigate]);
+  }, [user, loading, currentStep, navigate]);
+
+  const handleStartFlow = () => {
+    if (!user) {
+      navigate('/auth');
+    } else {
+      goToStep('screener');
+    }
+  };
+
+  const handleScreenerComplete = (data: any) => {
+    updateScreenerData(data);
+    nextStep(); // Go to upload step
+  };
+
+  const handleUploadComplete = (documents: File[]) => {
+    updateUploadedDocuments(documents);
+    // Simulate processing and go to results
+    setTimeout(() => {
+      updateEligibilityResults({
+        eligible: true,
+        programs: ['Federal Medicaid', 'SNAP'],
+        message: 'Based on your information, you appear eligible for multiple programs.'
+      });
+      goToStep('results');
+    }, 2000);
+  };
 
   const renderCurrentView = () => {
-    switch (currentState) {
+    switch (currentStep) {
+      case "screener":
+        return (
+          <QuickScreener 
+            onComplete={handleScreenerComplete}
+            onBack={() => goToStep('landing')}
+          />
+        );
       case "upload":
-        return <DocumentUpload />;
+        return (
+          <DocumentUpload 
+            onComplete={handleUploadComplete}
+            onBack={() => goToStep('screener')}
+          />
+        );
       case "results":
-        return <EligibilityStatus />;
+        return (
+          <EligibilityStatus 
+            results={flowData.eligibilityResults}
+            onStartOver={() => goToStep('landing')}
+          />
+        );
       default:
-        return <HeroSection />;
+        return <HeroSection onStartFlow={handleStartFlow} />;
     }
   };
 
@@ -37,31 +88,6 @@ const Index = () => {
       <main className="pt-20">
         {renderCurrentView()}
       </main>
-      
-      {/* Development Navigation */}
-      <div className="fixed bottom-4 right-4 bg-white shadow-elevated rounded-lg p-4 border">
-        <p className="text-sm font-medium mb-2">Demo Navigation:</p>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setCurrentState("landing")}
-            className={`px-3 py-1 text-xs rounded ${currentState === "landing" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            Landing
-          </button>
-          <button 
-            onClick={() => setCurrentState("upload")}
-            className={`px-3 py-1 text-xs rounded ${currentState === "upload" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            Upload
-          </button>
-          <button 
-            onClick={() => setCurrentState("results")}
-            className={`px-3 py-1 text-xs rounded ${currentState === "results" ? "bg-primary text-primary-foreground" : "bg-muted"}`}
-          >
-            Results
-          </button>
-        </div>
-      </div>
     </div>
   );
 };

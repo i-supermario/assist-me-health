@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, FileText, Shield, CheckCircle } from "lucide-react";
 import heroImage from "@/assets/hero-healthcare.jpg";
 
-export const HeroSection = () => {
+interface HeroSectionProps {
+  onStartFlow: () => void;
+}
+
+export const HeroSection = ({ onStartFlow }: HeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image with Overlay */}
@@ -52,6 +56,7 @@ export const HeroSection = () => {
               variant="hero" 
               size="lg"
               className="text-lg px-8 py-4"
+              onClick={onStartFlow}
             >
               Start Eligibility Check
               <ArrowRight className="ml-2 w-5 h-5" />

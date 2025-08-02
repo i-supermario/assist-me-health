@@ -56,7 +56,12 @@ const extractedData = {
   citizenship: "US Citizen"
 };
 
-export const EligibilityStatus = () => {
+interface EligibilityStatusProps {
+  results: any;
+  onStartOver: () => void;
+}
+
+export const EligibilityStatus = ({ results, onStartOver }: EligibilityStatusProps) => {
   const getStatusIcon = (status: EligibilityResult["status"]) => {
     switch (status) {
       case "eligible":
@@ -83,11 +88,17 @@ export const EligibilityStatus = () => {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <img 
-          src={statusIcons} 
-          alt="Eligibility Status" 
-          className="w-48 h-32 mx-auto mb-6 object-contain"
-        />
+        <div className="flex justify-between items-center mb-6">
+          <Button variant="outline" onClick={onStartOver}>
+            Start New Check
+          </Button>
+          <img 
+            src={statusIcons} 
+            alt="Eligibility Status" 
+            className="w-48 h-32 object-contain"
+          />
+          <div className="w-32" /> {/* Spacer for center alignment */}
+        </div>
         <h1 className="text-4xl font-bold text-foreground mb-4">
           Your Eligibility Results
         </h1>
