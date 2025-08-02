@@ -2,12 +2,23 @@ import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { DocumentUpload } from "@/components/DocumentUpload";
 import { EligibilityStatus } from "@/components/EligibilityStatus";
-import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 type AppState = "landing" | "upload" | "results";
 
 const Index = () => {
   const [currentState, setCurrentState] = useState<AppState>("landing");
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect non-authenticated users to auth page when they try to access protected features
+  useEffect(() => {
+    if (!loading && !user && (currentState === "upload" || currentState === "results")) {
+      navigate('/auth');
+    }
+  }, [user, loading, currentState, navigate]);
 
   const renderCurrentView = () => {
     switch (currentState) {
