@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertTriangle, X, Download, ExternalLink } from "lucide-react";
 import statusIcons from "@/assets/status-icons.png";
+import { EligibilityChat } from "./EligibilityChat";
 
 interface EligibilityResult {
   program: string;
@@ -59,9 +60,10 @@ const extractedData = {
 interface EligibilityStatusProps {
   results: any;
   onStartOver: () => void;
+  screenerData?: any;
 }
 
-export const EligibilityStatus = ({ results, onStartOver }: EligibilityStatusProps) => {
+export const EligibilityStatus = ({ results, onStartOver, screenerData }: EligibilityStatusProps) => {
   const getStatusIcon = (status: EligibilityResult["status"]) => {
     switch (status) {
       case "eligible":
@@ -233,6 +235,12 @@ export const EligibilityStatus = ({ results, onStartOver }: EligibilityStatusPro
           </Card>
         </div>
       </div>
+      
+      {/* Chat Assistant */}
+      <EligibilityChat 
+        eligibilityResults={results} 
+        screenerData={screenerData}
+      />
     </div>
   );
 };

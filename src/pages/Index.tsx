@@ -75,6 +75,7 @@ const Index = () => {
           <EligibilityStatus 
             results={flowData.eligibilityResults}
             onStartOver={() => goToStep('landing')}
+            screenerData={flowData.screenerData}
           />
         );
       default:
